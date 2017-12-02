@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Category;
 use AppBundle\Entity\Task;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -20,9 +21,10 @@ class TaskController extends Controller
      * Lists all task entities.
      *
      * @Route("/", name="tasks")
-     * @Method("GET")
+     * @Method({"GET", "POST"})
+     *
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
@@ -34,9 +36,40 @@ class TaskController extends Controller
             'user' => $user,
             'isDone' => 0]);
 
+        //functionalities for category form
+        $category = new Category();
+        $formCategory = $this->createForm('AppBundle\Form\CategoryType', $category);
+        $formCategory->handleRequest($request);
+        if ($formCategory->isSubmitted() && $formCategory->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $category->setUser($user);
+            $em->persist($category);
+            $em->flush();
+
+            return $this->redirectToRoute('tasks');
+        }
+
+        //functionalities for task form
+        $task = new Task();
+        $formTasks = $this->createForm('AppBundle\Form\TaskType', $task);
+        $formTasks->handleRequest($request);
+
+        if ($formTasks->isSubmitted() && $formTasks->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $inputDate = new DateTime("now");
+            $task->setInputDate($inputDate);
+            $task->setUser($this->getUser());
+            $em->persist($task);
+            $em->flush();
+
+            return $this->redirectToRoute('tasks');
+        }
+
         return $this->render('task/index.html.twig', array(
             'tasks' => $tasks,
-            'categories' => $categories
+            'categories' => $categories,
+            'formCategory' => $formCategory->createView(),
+            'formTask' => $formTasks->createView()
         ));
     }
 

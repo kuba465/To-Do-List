@@ -4,25 +4,30 @@
 
 {% block body %}
     <div>
-        <h3 style="display: inline">Your lists</h3>
-        <a href="{{ url('category_new') }}">
-            <button class="btn btn-success glyphicon glyphicon-folder-open"> Dodaj</button>
-        </a>
+        <h3 class="yourLists">Your lists</h3>
+
+        <button id="addCategoryBtn" class="btn btn-success glyphicon glyphicon-folder-open"> Add</button>
+
     </div>
     <br>
     <div class="row">
-        <div class="col-md-3" id="lists">
-            {% for category in categories %}
-                <ul class="list-group nav nav-pills nav-stacked">
-                    {#<li class="active"><a href="#">Home</a></li>#}
-                    <li class="list-group-item"><a href="#">{{ category.name }}<span
-                                    class="badge">ilośc zadań</span></a></li>
-                </ul>
-            {% endfor %}
+        <div class="col-md-3">
+            <div class="addCategory">
+                {{ include('category/new.html.twig', {'form' : formCategory}) }}
+                <br>
+            </div>
+            <div id="lists">
+                {% for category in categories %}
+                    <ul class="list-group nav nav-pills nav-stacked">
+                        <li class="list-group-item"><a href="#">{{ category.name }}<span
+                                        class="badge">ilośc zadań</span></a></li>
+                    </ul>
+                {% endfor %}
+            </div>
         </div>
         <div class="col-md-9" id="tasks">
             <div id="newTask">
-
+                {{ include('task/new.html.twig', {'form' : formTask}) }}
             </div>
             <div class="list-group">
                 {% for task in tasks %}
@@ -33,4 +38,8 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/app/js/tasks.js') }}"></script>
 {% endblock %}
