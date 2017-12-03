@@ -3,11 +3,16 @@
 {% block title %}AppBundle:Main:index{% endblock %}
 
 {% block body %}
-    <div>
-        <h3 class="yourLists">Your lists</h3>
-
-        <button id="addCategoryBtn" class="btn btn-success glyphicon glyphicon-folder-open"> Add</button>
-
+    <div class="row">
+        <div class="col-md-3">
+            <h3 class="yourLists">Your lists</h3>
+            <button id="addCategoryBtn" class="btn btn-success glyphicon glyphicon-folder-open"> Add</button>
+        </div>
+        <div class="col-md-9">
+            <div id="newTask">
+                {{ include('task/new.html.twig', {'form' : formTask}) }}
+            </div>
+        </div>
     </div>
     <br>
     <div class="row">
@@ -18,28 +23,80 @@
             </div>
             <div id="lists">
                 {% for category in categories %}
-                    <ul class="list-group nav nav-pills nav-stacked">
-                        <li class="list-group-item"><a href="#">{{ category.name }}<span
-                                        class="badge">ilośc zadań</span></a></li>
-                    </ul>
+                    <a data-id="{{ category.id }}" href="{{ path('tasks', {'categoryId' : category.id}) }}" {% if category.id == app.request.get('categoryId') %} class="active" {% endif %}>
+                        <p id="category{{ category.id }}" class="list-group-item category">{{ category.name }}</p>
+                    </a>
                 {% endfor %}
             </div>
         </div>
-        <div class="col-md-9" id="tasks">
-            <div id="newTask">
-                {{ include('task/new.html.twig', {'form' : formTask}) }}
-            </div>
+        <div class="col-md-9 tasks">
             <div class="list-group">
                 {% for task in tasks %}
-                    <ul class="list-group">
-                        <li class="list-group-item"><a href="#">{{ task.name }}</a></li>
-                    </ul>
+                    <p id="{{ task.id }}" class="list-group-item task">
+                        <a href="{{ path('taskIsDone', {'id' : task.id, 'categoryId' : task.category.id}) }}">
+                            <button id="taskIsDone" type="button" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </button>
+                        </a>
+                        {{ task.name }}
+                    </p>
                 {% endfor %}
+            </div>
+            <button id="donedTasks" type="button" class="btn btn-default btn-sm">
+                <span class="glyphicon glyphicon-eye-close"> Show completed tasks</span>
+            </button>
+        </div>
+        <div id="showTask" class="col-md-3">
+            <button id="hideShowTask">
+                <span class="glyphicon glyphicon-triangle-right"></span>
+            </button>
+            <a id="editTaskButton" href="#" class="btn btn-primary">
+                <span class="glyphicon glyphicon-pencil"></span> Edit
+            </a>
+            <button class="btn btn-danger btn-md deleteTaskBtn">
+                <span class="glyphicon glyphicon-trash"></span> Delete
+            </button>
+            <table class="table table-striped showTask">
+                <tbody>
+                <tr>
+                    <th>Name:</th>
+                    <td id="name"></td>
+                </tr>
+                <tr>
+                    <th>Description:</th>
+                    <td id="description"></td>
+                </tr>
+                <tr>
+                    <th>Create date:</th>
+                    <td id="inputDate"></td>
+                </tr>
+                <tr>
+                    <th>Date to done:</th>
+                    <td id="dateToDone"></td>
+                </tr>
+                <tr>
+                    <th>Priority:</th>
+                    <td id="priority"></td>
+                </tr>
+                <tr id="categoryTr">
+                    <th>Category:</th>
+                    <td id="category"></td>
+                </tr>
+                <tr>
+                    <th>Comments:</th>
+                    <td id="comments"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="addComment">
+                {{ include('comment/new.html.twig', {'form' : formComment}) }}
             </div>
         </div>
     </div>
+
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('bundles/app/js/tasks.js') }}"></script>
+    <script src="{{ asset('bundles/app/js/moment.js') }}"></script>
 {% endblock %}

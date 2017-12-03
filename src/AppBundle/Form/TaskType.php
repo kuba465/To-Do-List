@@ -18,12 +18,13 @@ class TaskType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, ['attr' => ['class' => 'form-control']])
-            ->add('description', TextType::class, ['attr' => ['required' => true, 'class' => 'form-control']])
+            ->add('description', TextType::class, ['attr' => ['required' => false, 'class' => 'form-control']])
             ->add('dateToDone', DateTimeType::class, [
                 'widget' => 'single_text',
                 'html5' => false,
                 'attr' => [
-                    'class' => 'js-datepicker form-control'
+                    'class' => 'js-datepicker form-control',
+                    'required' => false
                 ],
             ])
             ->add('category', EntityType::class, [

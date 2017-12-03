@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use AppBundle\Entity\Task;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * Comment
@@ -11,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="comment")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CommentRepository")
  */
-class Comment
+class Comment implements JsonSerializable
 {
     /**
      * @var int
@@ -36,7 +37,7 @@ class Comment
     protected $task;
 
     /**
-     * @ORM\OneToOne(targetEntity="User")
+     * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $user;
@@ -122,5 +123,15 @@ class Comment
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'user' => $this->getUser(),
+            'description' => $this->getDescription(),
+            'task' => $this->getTask()
+        ];
     }
 }

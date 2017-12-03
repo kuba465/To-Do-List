@@ -8,12 +8,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="fos_user")
  */
-class User extends BaseUser
+class User extends BaseUser implements JsonSerializable
 {
     /**
      * @ORM\Id
@@ -162,5 +163,21 @@ class User extends BaseUser
     public function getTasks()
     {
         return $this->tasks;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'firstname' => $this->getFirstname(),
+            'lastname' => $this->getLastname(),
+            'categories' => $this->getCategories(),
+            'tasks' => $this->getTasks()
+        ];
+    }
+
+    public function __toString()
+    {
+        return $this->getUsername();
     }
 }

@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * Priority
@@ -10,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="priority")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\PriorityRepository")
  */
-class Priority
+class Priority implements JsonSerializable
 {
     /**
      * @var int
@@ -35,6 +36,10 @@ class Priority
      */
     private $value;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="priority")
+     */
+    private $tasks;
 
     /**
      * Get id
@@ -92,5 +97,14 @@ class Priority
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'value' => $this->getValue()
+        ];
     }
 }

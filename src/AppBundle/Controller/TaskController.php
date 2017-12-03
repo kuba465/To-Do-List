@@ -3,12 +3,18 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Category;
+use AppBundle\Entity\Comment;
 use AppBundle\Entity\Task;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Task controller.
@@ -20,21 +26,27 @@ class TaskController extends Controller
     /**
      * Lists all task entities.
      *
-     * @Route("/", name="tasks")
+     * @Route("/byCategory/{categoryId}", name="tasks")
+     * @Route("/", name="tasks_all")
      * @Method({"GET", "POST"})
      *
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, $categoryId = null)
     {
         if (!$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw $this->createAccessDeniedException();
         }
+
         $em = $this->getDoctrine()->getManager();
+
         $user = $this->getUser();
         $categories = $this->showCategories();
+
         $tasks = $em->getRepository('AppBundle:Task')->findBy([
             'user' => $user,
-            'isDone' => 0]);
+            'category' => $categoryId,
+            'isDone' => 0,
+        ]);
 
         //functionalities for category form
         $category = new Category();
@@ -65,14 +77,40 @@ class TaskController extends Controller
             return $this->redirectToRoute('tasks');
         }
 
+        $comment = new Comment();
+        $formComments = $this->createForm('AppBundle\Form\CommentType', $comment);
+
         return $this->render('task/index.html.twig', array(
             'tasks' => $tasks,
             'categories' => $categories,
             'formCategory' => $formCategory->createView(),
-            'formTask' => $formTasks->createView()
+            'formTask' => $formTasks->createView(),
+            'formComment' => $formComments->createView(),
         ));
     }
 
+    /**
+     * @Route("/addComment", name="addComment")
+     * @Method({"POST"})
+     */
+    public function addNewComment(Request $request)
+    {
+        $commentValue = $request->get('commentValue');
+        $taskId = $request->get('taskId');
+        $task = $this->getDoctrine()->getRepository('AppBundle:Task')->find($taskId);
+        $user = $this->getUser();
+
+        $comment = new Comment();
+        $comment->setDescription($commentValue)
+            ->setUser($user)
+            ->setTask($task);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($comment);
+        $em->flush();
+
+        return new JsonResponse(['added' => true, 'comment' => $comment]);
+    }
     /**
      * Creates a new task entity.
      *
@@ -93,7 +131,7 @@ class TaskController extends Controller
             $em->persist($task);
             $em->flush();
 
-            return $this->redirectToRoute('tasks', array('id' => $task->getId()));
+            return $this->redirectToRoute('tasks', array('id' => $task->getId(), 'categoryId' => $task->getCategory()->getId()));
         }
 
         return $this->render('task/new.html.twig', array(
@@ -106,16 +144,16 @@ class TaskController extends Controller
      * Finds and displays a task entity.
      *
      * @Route("/{id}", name="tasks_show")
-     * @Method("GET")
+     * @Method({"GET", "POST"})
      */
     public function showAction(Task $task)
     {
-        $deleteForm = $this->createDeleteForm($task);
 
-        return $this->render('task/show.html.twig', array(
-            'task' => $task,
-            'delete_form' => $deleteForm->createView(),
-        ));
+        $serializer = $this->get('jms_serializer');
+        $data = $serializer->serialize($task, 'json');
+
+        return new Response($data);
+
     }
 
     /**
@@ -133,21 +171,23 @@ class TaskController extends Controller
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('tasks_edit', array('id' => $task->getId()));
+            return $this->redirectToRoute('tasks');
         }
+
 
         return $this->render('task/edit.html.twig', array(
             'task' => $task,
             'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
         ));
+
+
     }
 
     /**
      * Deletes a task entity.
      *
      * @Route("/{id}", name="tasks_delete")
-     * @Method("DELETE")
+     * @Method("")
      */
     public function deleteAction(Request $request, Task $task)
     {
@@ -160,7 +200,60 @@ class TaskController extends Controller
             $em->flush();
         }
 
-        return $this->redirectToRoute('tasks_index');
+        return $this->redirectToRoute('tasks');
+    }
+
+    /**
+     * @Route("/{id}/delete", name="taskDelete")
+     * @Method("DELETE")
+     */
+    public function taskDeleteAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $taskIsDeleted = $em->getRepository("AppBundle:Task")->findOneById($id);
+
+        $doctrine = $this->getDoctrine();
+        $doctrine->getRepository("AppBundle:Task")->deleteAllStuffConnectWithTask($id);
+
+        $em->remove($taskIsDeleted);
+        $em->flush();
+
+//        return $this->redirectToRoute('tasks');
+        return new JsonResponse(['delete' => true]);
+    }
+
+    /**
+     * @Route("/{id}/done", name="taskIsDone")
+     */
+    public function taskIsDoneAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $task = $em->getRepository("AppBundle:Task")->findOneById($id);
+        $doctrine = $this->getDoctrine();
+        $taskIsDone = $doctrine->getRepository("AppBundle:Task")->makeTaskDone($id);
+        $catId = $task->getCategory()->getId();
+
+        return $this->redirectToRoute('tasks', ['categoryId' => $catId]);
+    }
+
+    /**
+     * @Route("/byCategory/{categoryId}/showDone", name="showDone")
+     * @Method({"GET", "POST"})
+     */
+    public function showDoneAction(Request $request, $categoryId)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+        $tasks = $em->getRepository('AppBundle:Task')->findBy([
+            'user' => $user,
+            'category' => $categoryId,
+            'isDone' => 1]);
+
+//        dump($tasks);
+        return new JsonResponse(['doneTasks' => $tasks]);
+//        return $this->render('comment/index.html.twig', array(
+
+//        ));
     }
 
     /**

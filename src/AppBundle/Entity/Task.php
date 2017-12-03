@@ -9,6 +9,7 @@ use AppBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * Task
@@ -16,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="task")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\TaskRepository")
  */
-class Task
+class Task implements JsonSerializable
 {
     /**
      * @var int
@@ -37,7 +38,7 @@ class Task
     /**
      * @var string
      *
-     * @ORM\Column(name="description", type="text")
+     * @ORM\Column(name="description", type="text", nullable=true)
      */
     private $description;
 
@@ -74,7 +75,7 @@ class Task
     protected $comments;
 
     /**
-     * @ORM\OneToOne(targetEntity="Priority")
+     * @ORM\ManyToOne(targetEntity="Priority", inversedBy="tasks")
      * @ORM\JoinColumn(name="priority_id", referencedColumnName="id")
      */
     protected $priority;
@@ -214,6 +215,7 @@ class Task
     {
         return $this->isDone;
     }
+
     /**
      * Constructor
      */
@@ -326,5 +328,26 @@ class Task
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
+            'inputDate' => $this->getInputDate(),
+            'dateToDone' => $this->getDateToDone(),
+            'isDone' => $this->getIsDone(),
+            'category' => $this->getCategory(),
+            'priority' => $this->getPriority(),
+            'comments' => $this->getComments(),
+            'user' => $this->getUser()
+        ];
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
     }
 }

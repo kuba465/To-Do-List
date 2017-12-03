@@ -7,6 +7,7 @@ use AppBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * Category
@@ -14,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="category")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CategoryRepository")
  */
-class Category
+class Category implements JsonSerializable
 {
     /**
      * @var int
@@ -77,6 +78,7 @@ class Category
     {
         return $this->name;
     }
+
     /**
      * Constructor
      */
@@ -141,5 +143,15 @@ class Category
     public function getTasks()
     {
         return $this->tasks;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'user' => $this->getUser(),
+            'tasks' => $this->getTasks()
+        ];
     }
 }
