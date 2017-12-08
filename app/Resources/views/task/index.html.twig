@@ -7,6 +7,9 @@
         <div class="col-md-3">
             <h3 class="yourLists">Your lists</h3>
             <button id="addCategoryBtn" class="btn btn-success glyphicon glyphicon-folder-open"> Add</button>
+            <div class="addCategory">
+                {{ include('category/new.html.twig', {'form' : formCategory}) }}
+            </div>
         </div>
         <div class="col-md-9">
             <div id="newTask">
@@ -17,10 +20,6 @@
     <br>
     <div class="row">
         <div class="col-md-3">
-            <div class="addCategory">
-                {{ include('category/new.html.twig', {'form' : formCategory}) }}
-                <br>
-            </div>
             <div id="lists">
                 {% for category in categories %}
                     <a data-id="{{ category.id }}" href="{{ path('tasks', {'categoryId' : category.id}) }}" {% if category.id == app.request.get('categoryId') %} class="active" {% endif %}>
@@ -45,6 +44,7 @@
             <button id="donedTasks" type="button" class="btn btn-default btn-sm">
                 <span class="glyphicon glyphicon-eye-close"> Show completed tasks</span>
             </button>
+
         </div>
         <div id="showTask" class="col-md-3">
             <button id="hideShowTask">

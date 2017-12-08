@@ -4,6 +4,8 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * Priority
@@ -26,6 +28,7 @@ class Priority implements JsonSerializable
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     * @Assert\NotBlank(message="You must add some name to priority")
      */
     private $name;
 
@@ -33,6 +36,10 @@ class Priority implements JsonSerializable
      * @var int
      *
      * @ORM\Column(name="value", type="integer")
+     * @Assert\Type(
+     *     type="integer",
+     *     message="Value of priority must be an integer"
+     * )
      */
     private $value;
 

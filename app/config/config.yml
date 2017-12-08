@@ -81,3 +81,6 @@ fos_user:
     from_email:
         address: "jakub.k.paluszkiewicz@gmail.com"
         sender_name: "Kuba"
+
+sc_datetimepicker:
+    picker: ~

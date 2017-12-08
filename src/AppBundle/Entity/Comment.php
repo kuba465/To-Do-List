@@ -5,6 +5,8 @@ namespace AppBundle\Entity;
 use AppBundle\Entity\Task;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * Comment
@@ -27,6 +29,7 @@ class Comment implements JsonSerializable
      * @var string
      *
      * @ORM\Column(name="description", type="text")
+     * @Assert\NotBlank(message="You need to put some text here...")
      */
     private $description;
 

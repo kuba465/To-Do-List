@@ -26,8 +26,8 @@ class TaskController extends Controller
     /**
      * Lists all task entities.
      *
-     * @Route("/byCategory/{categoryId}", name="tasks")
      * @Route("/", name="tasks_all")
+     * @Route("/byCategory/{categoryId}", name="tasks")
      * @Method({"GET", "POST"})
      *
      */
@@ -109,8 +109,9 @@ class TaskController extends Controller
         $em->persist($comment);
         $em->flush();
 
-        return new JsonResponse(['added' => true, 'comment' => $comment]);
+        return new JsonResponse(['user' => $user, 'comment' => $comment]);
     }
+
     /**
      * Creates a new task entity.
      *

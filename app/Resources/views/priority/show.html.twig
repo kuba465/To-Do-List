@@ -1,10 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Priority</h1>
+    <div class="container">
+        <h1>Priority</h1>
 
-    <table>
-        <tbody>
+        <table class="table table-striped">
+            <tbody>
             <tr>
                 <th>Id</th>
                 <td>{{ priority.id }}</td>
@@ -17,20 +18,15 @@
                 <th>Value</th>
                 <td>{{ priority.value }}</td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
-    <ul>
-        <li>
-            <a href="{{ path('priority_index') }}">Back to the list</a>
-        </li>
-        <li>
-            <a href="{{ path('priority_edit', { 'id': priority.id }) }}">Edit</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
+                <a href="{{ path('priority_index') }}" class="btn btn-default">Back to the list</a>
+                <a href="{{ path('priority_edit', { 'id': priority.id }) }}" class="btn btn-warning">Edit</a>
+                {{ form_start(delete_form) }}
+                <input type="submit" value="Delete" class="btn btn-danger">
+                {{ form_end(delete_form) }}
+            </li>
+        </ul>
+    </div>
 {% endblock %}

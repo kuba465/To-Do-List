@@ -20,6 +20,10 @@
             <a class="navbar-brand" href="{{ url('tasks') }}">To-Do List by Jakub</a>
         </div>
         <ul class="nav navbar-nav navbar-right">
+            {% if is_granted('ROLE_ADMIN') %}
+                <li><a href="{{ url('priority_index') }}"><span
+                                class="glyphicon glyphicon glyphicon-star"></span> Priorities</a></li>
+            {% endif %}
             {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
                 <li><a href="{{ url('fos_user_profile_show') }}"><span
                                 class="glyphicon glyphicon-user"></span> {{ app.user.username }}</a></li>

@@ -24,7 +24,7 @@ class TaskType extends AbstractType
                 'html5' => false,
                 'attr' => [
                     'class' => 'js-datepicker form-control',
-                    'required' => false
+                    'required' => false,
                 ],
             ])
             ->add('category', EntityType::class, [

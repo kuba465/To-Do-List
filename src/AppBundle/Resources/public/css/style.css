@@ -4,6 +4,7 @@ h3.yourLists {
 
 .addCategory {
     display: none;
+    margin: 10px 0px;
 }
 
 .task {

@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Task
@@ -32,6 +33,7 @@ class Task implements JsonSerializable
      * @var string
      *
      * @ORM\Column(name="name", type="text")
+     * @Assert\NotBlank(message="Add some task")
      */
     private $name;
 
@@ -46,6 +48,7 @@ class Task implements JsonSerializable
      * @var \DateTime
      *
      * @ORM\Column(name="inputDate", type="datetime")
+     * @Assert\DateTime()
      */
     private $inputDate;
 
@@ -53,6 +56,7 @@ class Task implements JsonSerializable
      * @var \DateTime
      *
      * @ORM\Column(name="dateToDone", type="datetime", nullable=true)
+     * @Assert\DateTime()
      */
     private $dateToDone;
 

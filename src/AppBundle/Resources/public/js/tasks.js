@@ -5,6 +5,7 @@ $(document).ready(function () {
 
     $('.js-datepicker').datepicker();
 
+
     var taskIsDone = $("#taskIsDone");
     taskIsDone.click(function (e) {
         e.stopPropagation();
@@ -44,6 +45,7 @@ $(document).ready(function () {
         var taskId = $(this).attr('id');
         var addCommentBtn = $('#addComment');
         var divComment = $('.addComment');
+        var tdToPutNewComment = $('td#comments');
         addCommentBtn.click(function (e) {
 
             var commentValue = divComment.find('textarea').val();
@@ -55,8 +57,12 @@ $(document).ready(function () {
                     'taskId': taskId,
                     'commentValue': commentValue,
                 }
-            }).done(function(success){
-                console.log(success);
+            }).done(function (success) {
+                var newComment = '<dl>' +
+                    '<dt>' + success.user.username + '</dt>' +
+                    '<dd>' + success.comment.description + '</dd>' +
+                    '</dl>';
+                tdToPutNewComment.append(newComment);
             });
             e.preventDefault();
         });
@@ -78,20 +84,26 @@ $(document).ready(function () {
     buttonToHideShowTask.click(function () {
         divWithTaskList.removeClass('col-md-6').addClass('col-md-9');
         showTaskDiv.toggle();
-    })
+    });
 
     var categoryId = $('#lists .active').data('id');
     var buttonDonedTasks = $('button#donedTasks');
+
     buttonDonedTasks.click(function () {
         $.ajax({
             method: 'GET',
             url: categoryId + "/showDone",
             dataType: 'json'
         }).done(function (success) {
-            buttonDonedTasks.after(createParagraphWithCompletedTask(success.doneTasks));
-        })
-    });
+            var elem = buttonDonedTasks.parent().find('#showDonedTasks');
 
+            if (elem.is(':visible')) {
+                elem.remove();
+            } else {
+                buttonDonedTasks.after(createParagraphWithCompletedTask(success.doneTasks));
+            }
+        });
+    });
 });
 
 function putInfoOfComment(comments) {
@@ -108,7 +120,7 @@ function putInfoOfComment(comments) {
 }
 
 function createParagraphWithCompletedTask(tasks) {
-    var newDiv = '<div class="list-group">';
+    var newDiv = '<div id="showDonedTasks" class="list-group">';
 
     for (var i = 0; i < tasks.length; i++) {
         newDiv += '<p class="list-group-item taskDoned">' + tasks[i].name + '</p>'
