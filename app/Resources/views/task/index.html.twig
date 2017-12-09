@@ -1,6 +1,6 @@
 {% extends "::base.html.twig" %}
 
-{% block title %}AppBundle:Main:index{% endblock %}
+{% block title %}To-Do List{% endblock %}
 
 {% block body %}
     <div class="row">
@@ -98,5 +98,4 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('bundles/app/js/tasks.js') }}"></script>
-    <script src="{{ asset('bundles/app/js/moment.js') }}"></script>
 {% endblock %}

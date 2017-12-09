@@ -85,12 +85,6 @@ class Task implements JsonSerializable
     protected $priority;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="tasks")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     */
-    protected $user;
-
-    /**
      * Get id
      *
      * @return int
@@ -310,32 +304,17 @@ class Task implements JsonSerializable
         return $this->priority;
     }
 
-    /**
-     * Set user
-     *
-     * @param User $user
-     *
-     * @return Task
-     */
-    public function setUser(User $user = null)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * Get user
-     *
-     * @return User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
     public function jsonSerialize()
     {
+        $commentsArray = [];
+        $comments = $this->getComments();
+        foreach ($comments as $comment) {
+            $commentsArray[] = [
+                'description' => $comment->getDescription(),
+                'user' => $comment->getUser()->getUserName(),
+            ];
+        }
+
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
@@ -343,10 +322,9 @@ class Task implements JsonSerializable
             'inputDate' => $this->getInputDate(),
             'dateToDone' => $this->getDateToDone(),
             'isDone' => $this->getIsDone(),
-            'category' => $this->getCategory(),
-            'priority' => $this->getPriority(),
-            'comments' => $this->getComments(),
-            'user' => $this->getUser()
+            'category' => $this->getCategory()->getName(),
+            'priority' => $this->getPriority()->getName(),
+            'comments' => $commentsArray,
         ];
     }
 

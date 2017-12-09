@@ -3,7 +3,7 @@ $(document).ready(function () {
         $("div.addCategory").toggle();
     });
 
-    $('.js-datepicker').datepicker();
+    $('#datetimepicker1').datetimepicker();
 
 
     var taskIsDone = $("#taskIsDone");
@@ -37,8 +37,8 @@ $(document).ready(function () {
             tds.eq(1).text(success.description);
             tds.eq(2).text(moment(success.input_date).format('Do MMMM YYYY, h:mm:ss'));
             tds.eq(3).text(moment(success.date_to_done).format('Do MMMM YYYY, h:mm:ss'));
-            tds.eq(4).text(success.priority.name);
-            tds.eq(5).text(success.category.name);
+            tds.eq(4).text(success.priority);
+            tds.eq(5).text(success.category);
             tds.eq(6).text('');
             tds.eq(6).append(putInfoOfComment(success.comments));
         });
@@ -110,7 +110,7 @@ function putInfoOfComment(comments) {
     var newList = '<dl>';
 
     for (var i = 0; i < comments.length; i++) {
-        newList += '<dt>' + comments[i].user.username + '</dt>';
+        newList += '<dt>' + comments[i].user + '</dt>';
         newList += '<dd>' + comments[i].description + '</dd>';
         newList += '<br>';
     }

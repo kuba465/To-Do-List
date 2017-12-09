@@ -43,7 +43,6 @@ class TaskController extends Controller
         $categories = $this->showCategories();
 
         $tasks = $em->getRepository('AppBundle:Task')->findBy([
-            'user' => $user,
             'category' => $categoryId,
             'isDone' => 0,
         ]);
@@ -63,14 +62,19 @@ class TaskController extends Controller
 
         //functionalities for task form
         $task = new Task();
-        $formTasks = $this->createForm('AppBundle\Form\TaskType', $task);
+        $formTasks = $this->createForm('AppBundle\Form\TaskType', $task, [
+            'user' => $user->getId()
+        ]);
+
+
+//        $formTasks->add()
+
         $formTasks->handleRequest($request);
 
         if ($formTasks->isSubmitted() && $formTasks->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $inputDate = new DateTime("now");
             $task->setInputDate($inputDate);
-            $task->setUser($this->getUser());
             $em->persist($task);
             $em->flush();
 
@@ -105,9 +109,15 @@ class TaskController extends Controller
             ->setUser($user)
             ->setTask($task);
 
+        // WLIDACJA
+//ERR
+//        return JSON (error => "ajdasdkajfd")
+
+//OK
         $em = $this->getDoctrine()->getManager();
         $em->persist($comment);
         $em->flush();
+
 
         return new JsonResponse(['user' => $user, 'comment' => $comment]);
     }
@@ -128,7 +138,6 @@ class TaskController extends Controller
             $em = $this->getDoctrine()->getManager();
             $inputDate = new DateTime("now");
             $task->setInputDate($inputDate);
-            $task->setUser($this->getUser());
             $em->persist($task);
             $em->flush();
 
@@ -149,12 +158,7 @@ class TaskController extends Controller
      */
     public function showAction(Task $task)
     {
-
-        $serializer = $this->get('jms_serializer');
-        $data = $serializer->serialize($task, 'json');
-
-        return new Response($data);
-
+        return new JsonResponse($task);
     }
 
     /**

@@ -14,7 +14,7 @@ use JsonSerializable;
  * @ORM\Entity
  * @ORM\Table(name="fos_user")
  */
-class User extends BaseUser implements JsonSerializable
+class User extends BaseUser
 {
     /**
      * @ORM\Id
@@ -38,15 +38,10 @@ class User extends BaseUser implements JsonSerializable
      */
     protected $categories;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Task", mappedBy="user")
-     */
-    protected $tasks;
 
     public function __construct()
     {
         parent::__construct();
-        $this->tasks = new ArrayCollection();
     }
 
     /**
@@ -129,51 +124,6 @@ class User extends BaseUser implements JsonSerializable
     public function getCategories()
     {
         return $this->categories;
-    }
-
-    /**
-     * Add task
-     *
-     * @param Task $task
-     *
-     * @return User
-     */
-    public function addTask(Task $task)
-    {
-        $this->tasks[] = $task;
-
-        return $this;
-    }
-
-    /**
-     * Remove task
-     *
-     * @param Task $task
-     */
-    public function removeTask(Task $task)
-    {
-        $this->tasks->removeElement($task);
-    }
-
-    /**
-     * Get tasks
-     *
-     * @return Collection
-     */
-    public function getTasks()
-    {
-        return $this->tasks;
-    }
-
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->getId(),
-            'firstname' => $this->getFirstname(),
-            'lastname' => $this->getLastname(),
-            'categories' => $this->getCategories(),
-            'tasks' => $this->getTasks()
-        ];
     }
 
     public function __toString()
