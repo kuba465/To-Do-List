@@ -1,6 +1,8 @@
 To-Do-List by Jakub Paluszkiewicz
 ==========
 
+## Project that I created during my course in CodersLab
+
 # Technologies
 I wrote this app in Symfony. I used Doctrine, FOSUserBundle, JMSSerializerBundle, JavaScript/jQuery, AJAX.
 I musted to use JMS SErializer, because I made a huge mistake when I designed my database.
